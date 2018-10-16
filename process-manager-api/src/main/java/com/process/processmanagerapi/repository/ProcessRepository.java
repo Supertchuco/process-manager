@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface  ProcessRepository extends CrudRepository<Process, Long> {
 
+    Process findByProcessNumber(final int processNumber);
 }

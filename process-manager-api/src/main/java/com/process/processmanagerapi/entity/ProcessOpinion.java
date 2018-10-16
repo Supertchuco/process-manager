@@ -34,4 +34,12 @@ public class ProcessOpinion implements Serializable {
     @JsonManagedReference
     @JoinColumn(name = "processNumber", nullable = false)
     private Process process;
+
+    public ProcessOpinion(final String processOpinion, final Date createDate, final String createBy,
+                          final Process process) {
+        this.processOpinion = processOpinion;
+        this.createDate = createDate;
+        this.createBy = createBy;
+        this.process = process;
+    }
 }

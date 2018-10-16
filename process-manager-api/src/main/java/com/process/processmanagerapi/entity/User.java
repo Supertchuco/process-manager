@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @Entity(name = "User")
@@ -25,6 +26,19 @@ public class User implements Serializable {
     @Column
     private String password;
 
+    @Column
+    private Date createDate;
+
+    @Column
+    private String createBy;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserType userType;
+
+    public User(final String userName, final String password, final Date createDate, final String createBy){
+        this.userName = userName;
+        this.password = password;
+        this.createDate = createDate;
+        this.createBy = createBy;
+    }
 }

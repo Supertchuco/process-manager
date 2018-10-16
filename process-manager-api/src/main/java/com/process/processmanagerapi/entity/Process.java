@@ -30,8 +30,25 @@ public class Process implements Serializable {
     @Column
     private String finishBy;
 
+    @Column
+    private Date createDate;
+
+    @Column
+    private String createBy;
+
     @OneToMany(mappedBy = "process", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<ProcessOpinion> processOpinion;
+
+    @OneToMany(mappedBy = "process", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<User> OpinionUsers;
+
+    public Process(final int processNumber, final String processDescription, final Date createDate, final String createBy){
+        this.processNumber = processNumber;
+        this.processDescription = processDescription;
+        this.createDate = createDate;
+        this.createBy = createBy;
+    }
 
 }

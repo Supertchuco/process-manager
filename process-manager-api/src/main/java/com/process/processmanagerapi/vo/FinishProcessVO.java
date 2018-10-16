@@ -5,11 +5,10 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class CreateProcessVO implements Serializable {
+public class FinishProcessVO implements Serializable {
 
     private int processNumber;
 
-    private String processDescription;
+    private String finishBy;
 
-    private String createBy;
 }
