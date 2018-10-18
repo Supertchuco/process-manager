@@ -1,14 +1,17 @@
 package com.process.processmanagerapi.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Data
-@Entity(name = "ProcessOpinion")
-@Table(name = "ProcessOpinion")
+@Entity(name = "UserType")
+@Table(name = "UserType")
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserType implements Serializable {
 
     @Id
@@ -18,10 +21,5 @@ public class UserType implements Serializable {
 
     @Column
     private String userTypeName;
-
-    @OneToMany
-    @JoinColumn(name = "userId")
-    @JsonBackReference
-    private User user;
 
 }

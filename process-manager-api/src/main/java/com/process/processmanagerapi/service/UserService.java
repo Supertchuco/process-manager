@@ -24,9 +24,9 @@ public class UserService {
     @Autowired
     private UserTypeService userTypeService;
 
-    public  final static String ADMIN_TYPE = "ADMIN_TYPE";
-    public final static String TRIADOR_USER = "TRIADOR_USER";
-    public final static String FINISHER_USER = "FINISHER_USER";
+    public  final static String ADMIN_TYPE = "ADMINISTRADOR";
+    public final static String TRIADOR_USER = "USUARIO-TRIADOR";
+    public final static String FINISHER_USER = "USUARIO-FINALIZADOR";
     public final static String NOT_SPECIFIED_USER = "NOT_SPECIFIED_USER";
 
     public User findUserByUserName(final String userName){
@@ -45,7 +45,7 @@ public class UserService {
         if(!StringUtils.equals(user.getUserType().getUserTypeName(), userType)){
             log.error("Currently user type {} not equal that user type required {} ", user.getUserType().getUserTypeName(),
                     userType);
-            throw new UserTypeRequiredException("Error to get user by user name");
+            throw new UserNotAuthorizedException("User is not authorized to perform this operation");
         }
     }
 
@@ -77,7 +77,6 @@ public class UserService {
             throw new UserTypeNotFoundException("User with user name specified already exist");
         }
         user = new User(createUserVO.getUserName(), createUserVO.getPassword(), new Date(), createUserVO.getCreatedByUser());
-        userType.setUser(user);
         user.setUserType(userType);
         user = userRepository.save(user);
         log.info("User created");

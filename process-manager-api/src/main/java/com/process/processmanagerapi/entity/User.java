@@ -1,8 +1,8 @@
 package com.process.processmanagerapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,7 +12,6 @@ import java.util.Date;
 @Entity(name = "User")
 @Table(name = "User")
 @AllArgsConstructor
-@NoArgsConstructor
 public class User implements Serializable {
 
     @Id
@@ -32,10 +31,11 @@ public class User implements Serializable {
     @Column
     private String createBy;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JoinColumn(name = "userTypeId")
+    @JsonManagedReference
     private UserType userType;
 
-    public User(final String userName, final String password, final Date createDate, final String createBy){
+    public User(final String userName, final String password, final Date createDate, final String createBy) {
         this.userName = userName;
         this.password = password;
         this.createDate = createDate;

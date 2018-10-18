@@ -3,11 +3,11 @@ package com.process.processmanagerapi.exception;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class UserNotAuthorizedAddProcessOpinionException extends RuntimeException {
+public class UserNotAuthorizedException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    public UserNotAuthorizedAddProcessOpinionException(final String message) {
+    public UserNotAuthorizedException(final String message) {
         super(message);
     }
 }
