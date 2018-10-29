@@ -3,14 +3,10 @@ package com.process.processmanagerapi.service;
 import com.process.processmanagerapi.entity.Process;
 import com.process.processmanagerapi.entity.ProcessOpinion;
 import com.process.processmanagerapi.entity.User;
-import com.process.processmanagerapi.exception.ProcessAlreadyExistException;
-import com.process.processmanagerapi.exception.ProcessAlreadyFinishedDuringIncludeProcessOpinionException;
-import com.process.processmanagerapi.exception.ProcessNotFoundException;
-import com.process.processmanagerapi.exception.UserNotAuthorizedException;
+import com.process.processmanagerapi.exception.*;
 import com.process.processmanagerapi.repository.ProcessRepository;
 import com.process.processmanagerapi.vo.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +32,13 @@ public class ProcessService {
         validateCreationProcess(createProcessVO.getProcessNumber());
         Process process = new Process(createProcessVO.getProcessNumber(), createProcessVO.getProcessDescription(),
                 new Date(), createProcessVO.getCreateBy());
-        process = processRepository.save(process);
+        try {
+            process = processRepository.save(process);
+
+        } catch (Exception e) {
+            log.error("Error during save process", e);
+            throw new ProcessSaveException(e.getMessage());
+        }
         log.info("process saved");
         return process;
     }
@@ -44,20 +46,26 @@ public class ProcessService {
     public Process includeProcessOpinion(final ProcessOpinionVO processOpinionVO) {
         log.info("Add process opinion to process with number {}", processOpinionVO.getProcessNumber());
         User user = userService.findUserByUserName(processOpinionVO.getUserName());
-        userService.verifyIfUserIsNull(user);
+        userService.validateUser(user, UserService.FINISHER_USER);
         Process process = findProcessByProcessNumber(processOpinionVO.getProcessNumber());
-        validateProcessBeforeIncludeOpinion(process, processOpinionVO.getProcessNumber());
-        if (!userService.verifyIfUserIsUserOpinion(user, process.getOpinionUsers()) && user.getUserType().getUserTypeName().equals(UserService.FINISHER_USER)) {
+        validateProcessBeforeIncludeOpinion(process);
+        if (!userService.isUserAuthorizedToIncludeProcessOpinion(user, process.getOpinionUsers())) {
             log.error("User {} is not authorized to add process opinion");
-            throw new UserNotAuthorizedException("User is not authorized to add process opinion");
+            throw new UserNotAuthorizedToIncludeProcessOpnionException("User is not authorized to add process opinion");
 
         }
-        if (CollectionUtils.isEmpty(process.getProcessOpinion())) {
+        if (Objects.isNull(process.getProcessOpinion())) {
             process.setProcessOpinion(new ArrayList<>());
         }
         process.getProcessOpinion().add(new ProcessOpinion(processOpinionVO.getProcessOpinion(), new Date(),
                 processOpinionVO.getUserName(), process));
-        process = processRepository.save(process);
+        try {
+            process = processRepository.save(process);
+
+        } catch (Exception e) {
+            log.error("Error during save process", e);
+            throw new ProcessSaveException(e.getMessage());
+        }
         log.info("process opinion added");
         return process;
     }
@@ -67,46 +75,61 @@ public class ProcessService {
         User user = userService.findUserByUserName(finishProcessVO.getFinishBy());
         userService.validateUser(user, UserService.FINISHER_USER);
         Process process = findProcessByProcessNumber(finishProcessVO.getProcessNumber());
-        validateProcess(process, finishProcessVO.getProcessNumber());
+        validateProcessBeforeFinishProcess(process);
         process.setFinishDate(new Date());
         process.setFinishBy(finishProcessVO.getFinishBy());
-        process = processRepository.save(process);
+        try {
+            process = processRepository.save(process);
+
+        } catch (Exception e) {
+            log.error("Error during save process", e);
+            throw new ProcessSaveException(e.getMessage());
+        }
         log.info("process finished");
         return process;
     }
 
-    public Process findProcessByProcessNumber(final ViewProcessByProcessNumberVO viewProcessByProcessNumberVO){
+    public Process getProcessByProcessNumber(final ViewProcessByProcessNumberVO viewProcessByProcessNumberVO) {
         log.info("Find process by process number");
         User user = userService.findUserByUserName(viewProcessByProcessNumberVO.getViewBy());
         userService.validateUser(user, UserService.TRIADOR_USER);
         return findProcessByProcessNumber(viewProcessByProcessNumberVO.getProcessNumber());
     }
 
-    public List<Process> findAllProcess(final ViewAllProcessVO viewAllProcessVO){
+    public List<Process> findAllProcess(final ViewAllProcessVO viewAllProcessVO) {
         log.info("Find process by process number");
         User user = userService.findUserByUserName(viewAllProcessVO.getViewBy());
         userService.validateUser(user, UserService.TRIADOR_USER);
-        return  processRepository.findAll();
+        return processRepository.findAll();
     }
 
-    private Process findProcessByProcessNumber(final int processNumber){
+    private Process findProcessByProcessNumber(final int processNumber) {
         return processRepository.findByProcessNumber(processNumber);
     }
 
-    private void validateProcess(final Process process, final int processNumber) {
-        log.info("validate process with number {}", processNumber);
+    private void validateProcess(final Process process) {
+        log.info("validate process");
         if (Objects.isNull(process)) {
-            log.error("Process with number {} not found", processNumber);
+            log.error("Process not found");
             throw new ProcessNotFoundException("Process not found");
         }
     }
 
-    private void validateProcessBeforeIncludeOpinion(final Process process, final int processNumber) {
-        log.info("validate process  number {} to include opinion", processNumber);
-        validateProcess(process, processNumber);
-        if(Objects.isNull(process.getFinishDate())){
-            log.error("Process with number {} already finalized", processNumber);
-            throw new ProcessAlreadyFinishedDuringIncludeProcessOpinionException("Process not found");
+    private void validateProcessBeforeFinishProcess(final Process process) {
+        log.info("validate process to finish");
+        validateProcess(process);
+        if (!Objects.isNull(process.getFinishDate())) {
+            log.error("Process with number {} already finalized", process.getProcessNumber());
+            throw new ProcessAlreadyFinishedDuringFinishProcessException("Process already finalized");
+        }
+    }
+
+    private void validateProcessBeforeIncludeOpinion(final Process process) {
+        log.info("validate process to include opinion");
+        validateProcess(process);
+        if (!Objects.isNull(process.getFinishDate())) {
+            log.error("Process with number {} already finalized", process.getProcessNumber());
+            throw new ProcessAlreadyFinishedDuringIncludeProcessOpinionException("Process already finalized");
         }
     }
 

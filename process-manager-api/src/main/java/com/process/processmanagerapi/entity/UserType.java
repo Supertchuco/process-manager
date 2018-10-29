@@ -11,7 +11,6 @@ import java.io.Serializable;
 @Entity(name = "UserType")
 @Table(name = "UserType")
 @AllArgsConstructor
-@NoArgsConstructor
 public class UserType implements Serializable {
 
     @Id
@@ -21,5 +20,9 @@ public class UserType implements Serializable {
 
     @Column
     private String userTypeName;
+
+    public UserType(final String userTypeName) {
+        this.userTypeName = userTypeName;
+    }
 
 }

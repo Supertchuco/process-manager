@@ -23,7 +23,7 @@ public class ProcessController {
         return processService.createProcess(createProcessVO);
     }
 
-    @RequestMapping(value = "/finalize", method = RequestMethod.POST)
+    @RequestMapping(value = "/finish", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public Process finishProcess(@RequestBody FinishProcessVO finishProcessVO) {
@@ -41,7 +41,7 @@ public class ProcessController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public Process findProcessByProcessNumber(@RequestBody ViewProcessByProcessNumberVO viewProcessByProcessNumberVO) {
-        return processService.findProcessByProcessNumber(viewProcessByProcessNumberVO);
+        return processService.getProcessByProcessNumber(viewProcessByProcessNumberVO);
     }
 
     @RequestMapping(value = "/includeProcessOpinion", method = RequestMethod.POST)
