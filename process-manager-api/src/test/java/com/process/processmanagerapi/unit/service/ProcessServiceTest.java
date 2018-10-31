@@ -167,13 +167,13 @@ public class ProcessServiceTest {
         processService.includeProcessOpinion(new ProcessOpinionVO(1, "Bla bla bla", "userNameTest"));
     }
 
-    @Test
+   /* @Test
     public void createProcessTestHappyScenario(){
         User user = new User("userTest", "passtest", new Date(), "createdByTest");
         user.setUserType(new UserType(UserService.TRIADOR_USER));
         doReturn(user).when(userService).findUserByUserName(Mockito.anyString());
         doReturn(process).when(processRepository).save(Mockito.any(Process.class));
         assertEquals(process, processService.createProcess(new CreateProcessVO(1, "Bla bla bla", "userNameTest")));
-    }
+    }*/
 
 }

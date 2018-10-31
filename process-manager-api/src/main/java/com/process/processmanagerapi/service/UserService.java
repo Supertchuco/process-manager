@@ -5,6 +5,7 @@ import com.process.processmanagerapi.entity.UserType;
 import com.process.processmanagerapi.exception.*;
 import com.process.processmanagerapi.repository.UserRepository;
 import com.process.processmanagerapi.vo.CreateUserVO;
+import com.process.processmanagerapi.vo.ViewAllUsersVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +40,18 @@ public class UserService {
         }
     }
 
+    public List<User> getAllUsers(ViewAllUsersVO viewAllUsersVO){
+        log.info("find all users");
+        User triggerUser = userRepository.findByUserName(viewAllUsersVO.getViewBy());
+        validateUser(triggerUser, UserService.ADMIN_TYPE);
+        try {
+            return userRepository.findAll();
+        } catch (Exception e) {
+            log.error("Error to get all user", e);
+            throw new UserServiceException("Error to get user by user name");
+        }
+    }
+
     public void validateUser(final User user, final String userType) {
         log.info("Validate user");
         verifyIfUserIsNull(user);
@@ -69,6 +82,10 @@ public class UserService {
 
     public User createUser(final CreateUserVO createUserVO) {
         log.info("Create user with user name: {} and user type: {}", createUserVO.getUserName(), createUserVO.getUserType());
+
+        User triggerUser = userRepository.findByUserName(createUserVO.getCreatedByUser());
+        validateUser(triggerUser, UserService.ADMIN_TYPE);
+
         User user = userRepository.findByUserName(createUserVO.getUserName());
         if (!Objects.isNull(user)) {
             log.error("User with user name: {} already exist", createUserVO.getUserName());

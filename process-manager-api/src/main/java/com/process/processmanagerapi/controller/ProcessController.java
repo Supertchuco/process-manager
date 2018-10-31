@@ -19,35 +19,35 @@ public class ProcessController {
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Process createProcess(@RequestBody CreateProcessVO createProcessVO) {
+    public Process createProcess(@RequestBody final CreateProcessVO createProcessVO) {
         return processService.createProcess(createProcessVO);
     }
 
     @RequestMapping(value = "/finish", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Process finishProcess(@RequestBody FinishProcessVO finishProcessVO) {
+    public Process finishProcess(@RequestBody final FinishProcessVO finishProcessVO) {
         return processService.finishProcess(finishProcessVO);
     }
 
     @RequestMapping(value = "/findAll", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<Process> findAllProcess(@RequestBody ViewAllProcessVO viewAllProcessVO) {
+    public List<Process> findAllProcess(@RequestBody final ViewAllProcessVO viewAllProcessVO) {
         return processService.findAllProcess(viewAllProcessVO);
     }
 
     @RequestMapping(value = "/findByProcessNumber", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Process findProcessByProcessNumber(@RequestBody ViewProcessByProcessNumberVO viewProcessByProcessNumberVO) {
+    public Process findProcessByProcessNumber(@RequestBody final ViewProcessByProcessNumberVO viewProcessByProcessNumberVO) {
         return processService.getProcessByProcessNumber(viewProcessByProcessNumberVO);
     }
 
     @RequestMapping(value = "/includeProcessOpinion", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Process includeProcessOpinion(@RequestBody ProcessOpinionVO processOpinionVO) {
+    public Process includeProcessOpinion(@RequestBody final ProcessOpinionVO processOpinionVO) {
         return processService.includeProcessOpinion(processOpinionVO);
     }
 

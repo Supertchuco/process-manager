@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-@Component
+//@Component
 public class DatabaseLoader implements CommandLineRunner {
 
     private final UserTypeRepository userTypeRepository;
@@ -33,9 +33,9 @@ public class DatabaseLoader implements CommandLineRunner {
         this.userTypeRepository.save(type2);
         this.userTypeRepository.save(type3);
 
-        userRepository.save(new User(1, "userNameAdmin", "passTeste", new Date(), "testUser", type1));
+/*        userRepository.save(new User(1, "userNameAdmin", "passTeste", new Date(), "testUser", type1));
         userRepository.save(new User(2, "userNameTriador", "passTeste", new Date(), "testUser", type2));
-        userRepository.save(new User(3, "userNameFinalizador", "passTeste", new Date(), "testUser", type3));
+        userRepository.save(new User(3, "userNameFinalizador", "passTeste", new Date(), "testUser", type3));*/
 
 
         this.processRepository.save(new Process(1, "description test", new Date(), "system"));

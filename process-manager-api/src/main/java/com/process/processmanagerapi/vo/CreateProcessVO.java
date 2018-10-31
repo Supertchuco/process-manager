@@ -6,7 +6,6 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-@AllArgsConstructor
 public class CreateProcessVO implements Serializable {
 
     private int processNumber;

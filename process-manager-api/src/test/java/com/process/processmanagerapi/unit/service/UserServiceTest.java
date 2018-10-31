@@ -50,6 +50,7 @@ public class UserServiceTest {
         UserType userType = new UserType(1, UserService.ADMIN_TYPE);
         doReturn(userType).when(userTypeService).findUserTypeByUserTypeName(Mockito.anyString());
         doReturn(user).when(userRepository).save(Mockito.any(User.class));
+        doReturn(user).when(userRepository).findByUserName("createdByTest");
         assertEquals(user, userService.createUser(new CreateUserVO("userNameTest", "pass", UserService.ADMIN_TYPE, "createdByTest")));
     }
 
@@ -61,12 +62,14 @@ public class UserServiceTest {
 
     @Test(expected = UserTypeNotFoundException.class)
     public void createUserTestWhenUserTypeNotFound() {
+        doReturn(user).when(userRepository).findByUserName("createdByTest");
         doReturn(user).when(userRepository).save(Mockito.any(User.class));
         userService.createUser(new CreateUserVO("userNameTest", "pass", UserService.ADMIN_TYPE, "createdByTest"));
     }
 
     @Test(expected = UserSaveException.class)
     public void createUserTestWhenSaveErrorOccurred() {
+        doReturn(user).when(userRepository).findByUserName("createdByTest");
         UserType userType = new UserType(1, UserService.ADMIN_TYPE);
         doReturn(userType).when(userTypeService).findUserTypeByUserTypeName(Mockito.anyString());
         doThrow(UserSaveException.class).when(userRepository).save(Mockito.any(User.class));

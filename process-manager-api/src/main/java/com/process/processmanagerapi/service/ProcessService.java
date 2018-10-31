@@ -49,16 +49,16 @@ public class ProcessService {
         userService.validateUser(user, UserService.FINISHER_USER);
         Process process = findProcessByProcessNumber(processOpinionVO.getProcessNumber());
         validateProcessBeforeIncludeOpinion(process);
-        if (!userService.isUserAuthorizedToIncludeProcessOpinion(user, process.getOpinionUsers())) {
+    /*     if (!userService.isUserAuthorizedToIncludeProcessOpinion(user, process.getOpinionUsers())) {
             log.error("User {} is not authorized to add process opinion");
             throw new UserNotAuthorizedToIncludeProcessOpnionException("User is not authorized to add process opinion");
 
         }
-        if (Objects.isNull(process.getProcessOpinion())) {
+       if (Objects.isNull(process.getProcessOpinion())) {
             process.setProcessOpinion(new ArrayList<>());
         }
         process.getProcessOpinion().add(new ProcessOpinion(processOpinionVO.getProcessOpinion(), new Date(),
-                processOpinionVO.getUserName(), process));
+                processOpinionVO.getUserName()));*/
         try {
             process = processRepository.save(process);
 

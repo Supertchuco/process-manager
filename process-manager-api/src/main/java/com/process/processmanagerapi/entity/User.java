@@ -9,8 +9,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Data
-@Entity(name = "User")
-@Table(name = "User")
+@Entity(name = "ProcessUser")
+@Table(name = "ProcessUser")
 @AllArgsConstructor
 public class User implements Serializable {
 
@@ -31,8 +31,8 @@ public class User implements Serializable {
     @Column
     private String createBy;
 
+    @OneToOne
     @JoinColumn(name = "userTypeId")
-    @JsonManagedReference
     private UserType userType;
 
     public User(final String userName, final String password, final Date createDate, final String createBy) {
