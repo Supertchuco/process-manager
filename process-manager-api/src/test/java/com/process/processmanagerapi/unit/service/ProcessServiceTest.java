@@ -80,7 +80,7 @@ public class ProcessServiceTest {
         ReflectionTestUtils.invokeMethod(processService, "validateProcessBeforeIncludeOpinion", inputArray);
     }
 
-    @Test
+/*    @Test
     public void getProcessByProcessNumberTestHappyScenario() {
         User user = new User("userTest", "passtest", new Date(), "createdByTest");
         user.setUserType(new UserType(UserService.TRIADOR_USER));
@@ -102,7 +102,7 @@ public class ProcessServiceTest {
     public void getProcessByProcessNumberTesWhenUserIsNotFound() {
         doThrow(UserNotFoundException.class).when(userService).validateUser(null, UserService.TRIADOR_USER);
         processService.getProcessByProcessNumber(new ViewProcessByProcessNumberVO(1, "userTest"));
-    }
+    }*/
 
   /*  @Test
     public void finishProcessTestHappyScenario() {

@@ -43,7 +43,7 @@ public class ExceptionResourceHandler extends ResponseEntityExceptionHandler {
     public final ResponseEntity<ExceptionResponse> handleProcessNotFoundException(ProcessNotFoundException ex, WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
                 request.getDescription(false));
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ProcessSaveException.class)
@@ -85,7 +85,7 @@ public class ExceptionResourceHandler extends ResponseEntityExceptionHandler {
     public final ResponseEntity<ExceptionResponse> handleUserNotFoundException(UserNotFoundException ex, WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
                 request.getDescription(false));
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UserSaveException.class)

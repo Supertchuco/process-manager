@@ -55,7 +55,7 @@ public class ProcessManageApiIntegrationTest {
         String payload = readJSON("request/createProcessWithUserNotExistOnDatabasePayload.json");
         HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
         ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/create"), HttpMethod.POST, entity, String.class);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertTrue(response.getBody().toString().contains("User not found"));
     }
 
@@ -64,7 +64,7 @@ public class ProcessManageApiIntegrationTest {
         String payload = readJSON("request/createProcessWithUserNotExistOnDatabasePayload.json");
         HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
         ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/create"), HttpMethod.POST, entity, String.class);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertTrue(response.getBody().toString().contains("User not found"));
     }
 
@@ -90,7 +90,7 @@ public class ProcessManageApiIntegrationTest {
         String payload = readJSON("request/includeProcessOpinionWhenProcessNotFoundPayload.json");
         HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
         ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/includeProcessOpinion"), HttpMethod.POST, entity, String.class);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertTrue(response.getBody().toString().contains("Process not found"));
     }
 
@@ -134,7 +134,7 @@ public class ProcessManageApiIntegrationTest {
         String payload = readJSON("request/finishProcessWithUserNotFoundPayload.json");
         HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
         ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/finish"), HttpMethod.POST, entity, String.class);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertTrue(response.getBody().toString().contains("User not found"));
     }
 
@@ -152,7 +152,7 @@ public class ProcessManageApiIntegrationTest {
         String payload = readJSON("request/finishProcessWithProcessNotFoundPayload.json");
         HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
         ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/finish"), HttpMethod.POST, entity, String.class);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertTrue(response.getBody().toString().contains("Process not found"));
     }
 
@@ -172,6 +172,41 @@ public class ProcessManageApiIntegrationTest {
         ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/finish"), HttpMethod.POST, entity, String.class);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertTrue(response.getBody().toString().contains("User is not authorized to finish this process"));
+    }
+
+    @Test
+    public void shouldReturn200WhenFindByProcessNumberWithSuccess() {
+        String payload = readJSON("request/findProcessByProcessNumberWithSuccessPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/findByProcessNumber"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void shouldReturn404WhenFindByProcessNumberWithProcessNotFound() {
+        String payload = readJSON("request/findProcessByProcessNumberWithProcessNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/findByProcessNumber"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("Process not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenFindByProcessNumberWithUserNotFound() {
+        String payload = readJSON("request/findProcessByProcessNumberWithUserNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/findByProcessNumber"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenFindByProcessNumberWithUserNotAuthorizedToPerformThisOperation() {
+        String payload = readJSON("request/findProcessByProcessNumberWithUserIsNotAuthorizedToPerformThisOperationPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/findByProcessNumber"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
     }
 
 }

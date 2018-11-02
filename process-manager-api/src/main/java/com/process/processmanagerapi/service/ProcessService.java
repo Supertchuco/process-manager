@@ -94,14 +94,16 @@ public class ProcessService {
     }
 
     public Process getProcessByProcessNumber(final ViewProcessByProcessNumberVO viewProcessByProcessNumberVO) {
-        log.info("Find process by process number");
+        log.info("Get process by process number");
         User user = userService.findUserByName(viewProcessByProcessNumberVO.getViewBy());
         userService.validateUser(user, UserService.TRIADOR_USER);
-        return findProcessByProcessNumber(viewProcessByProcessNumberVO.getProcessNumber());
+        Process process = findProcessByProcessNumber(viewProcessByProcessNumberVO.getProcessNumber());
+        validateProcess(process);
+        return process;
     }
 
-    public List<Process> findAllProcess(final ViewAllProcessVO viewAllProcessVO) {
-        log.info("Find process by process number");
+    public List<Process> getAllProcess(final ViewAllProcessVO viewAllProcessVO) {
+        log.info("Get all process");
         User user = userService.findUserByName(viewAllProcessVO.getViewBy());
         userService.validateUser(user, UserService.TRIADOR_USER);
         return processRepository.findAll();

@@ -34,7 +34,7 @@ public class ProcessController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<Process> findAllProcess(final @RequestBody ViewAllProcessVO viewAllProcessVO) {
-        return processService.findAllProcess(viewAllProcessVO);
+        return processService.getAllProcess(viewAllProcessVO);
     }
 
     @RequestMapping(value = "/findByProcessNumber", method = RequestMethod.POST)
