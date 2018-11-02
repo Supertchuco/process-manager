@@ -76,4 +76,48 @@ public class ProcessManageApiIntegrationTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
     }
+
+    @Test
+    public void shouldReturn200WhenIncludeNewProcessOpinionWithSuccess() {
+        String payload = readJSON("request/includeProcessOpinionWithSuccessPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/includeProcessOpinion"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void shouldReturn400WhenIncludeNewProcessOpinionWithProcessNotFound() {
+        String payload = readJSON("request/includeProcessOpinionWhenProcessNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/includeProcessOpinion"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("Process not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenIncludeNewProcessOpinionWithProcessFinished() {
+        String payload = readJSON("request/includeProcessOpinionWhenProcessIsFinishedPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/includeProcessOpinion"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("Process is finalized"));
+    }
+
+    @Test
+    public void shouldReturn400WhenIncludeNewProcessOpinionWithUserNotAuthorized() {
+        String payload = readJSON("request/includeProcessOpinionWithUserNotAuthorizedPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/includeProcessOpinion"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
+    }
+
+    @Test
+    public void shouldReturn400WhenIncludeNewProcessOpinionWithUserIsNotAuthorizedToIncludeOpinionForThisProcess() {
+        String payload = readJSON("request/includeProcessOpinionWhenUserIsNotAuthorizedToIncludeOpinionForThisProcessPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/includeProcessOpinion"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User is not authorized to add process opinion for this process"));
+    }
 }

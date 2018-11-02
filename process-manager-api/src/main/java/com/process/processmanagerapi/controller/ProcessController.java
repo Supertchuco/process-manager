@@ -19,35 +19,35 @@ public class ProcessController {
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Process createProcess(@RequestBody final CreateProcessVO createProcessVO) {
+    public Process createProcess(final @RequestBody CreateProcessVO createProcessVO) {
         return processService.createProcess(createProcessVO);
     }
 
     @RequestMapping(value = "/finish", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Process finishProcess(@RequestBody final FinishProcessVO finishProcessVO) {
+    public Process finishProcess(final @RequestBody FinishProcessVO finishProcessVO) {
         return processService.finishProcess(finishProcessVO);
     }
 
     @RequestMapping(value = "/findAll", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<Process> findAllProcess(@RequestBody final ViewAllProcessVO viewAllProcessVO) {
+    public List<Process> findAllProcess(final @RequestBody ViewAllProcessVO viewAllProcessVO) {
         return processService.findAllProcess(viewAllProcessVO);
     }
 
     @RequestMapping(value = "/findByProcessNumber", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Process findProcessByProcessNumber(@RequestBody final ViewProcessByProcessNumberVO viewProcessByProcessNumberVO) {
+    public Process findProcessByProcessNumber(final @RequestBody ViewProcessByProcessNumberVO viewProcessByProcessNumberVO) {
         return processService.getProcessByProcessNumber(viewProcessByProcessNumberVO);
     }
 
     @RequestMapping(value = "/includeProcessOpinion", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Process includeProcessOpinion(@RequestBody final ProcessOpinionVO processOpinionVO) {
+    public Process includeProcessOpinion(final @RequestBody ProcessOpinionVO processOpinionVO) {
         return processService.includeProcessOpinion(processOpinionVO);
     }
 

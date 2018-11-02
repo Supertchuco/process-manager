@@ -36,7 +36,7 @@ public class ExceptionResourceHandler extends ResponseEntityExceptionHandler {
     public final ResponseEntity<ExceptionResponse> handleProcessAlreadyFinishedDuringIncludeProcessOpinionException(ProcessAlreadyFinishedDuringIncludeProcessOpinionException ex, WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
                 request.getDescription(false));
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ProcessNotFoundException.class)

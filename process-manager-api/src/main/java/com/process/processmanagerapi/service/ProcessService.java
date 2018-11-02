@@ -49,19 +49,19 @@ public class ProcessService {
         userService.validateUser(user, UserService.FINISHER_USER);
         Process process = findProcessByProcessNumber(processOpinionVO.getProcessNumber());
         validateProcessBeforeIncludeOpinion(process);
-         if (!userService.isUserAuthorizedToIncludeProcessOpinion(user, process.getAuthorizedUsers())) {
+        if (!userService.isUserAuthorizedToIncludeProcessOpinion(user, process.getAuthorizedUsers())) {
             log.error("User {} is not authorized to add process opinion");
-            throw new UserNotAuthorizedToIncludeProcessOpnionException("User is not authorized to add process opinion");
+            throw new UserNotAuthorizedToIncludeProcessOpnionException("User is not authorized to add process opinion for this process");
 
         }
-       if (Objects.isNull(process.getProcessOpinions())) {
+        if (Objects.isNull(process.getProcessOpinions())) {
             process.setProcessOpinions(new ArrayList<>());
         }
+
         process.getProcessOpinions().add(new ProcessOpinion(processOpinionVO.getProcessOpinion(), new Date(),
-                processOpinionVO.getUserName()));
+                processOpinionVO.getUserName(), user));
         try {
             process = processRepository.save(process);
-
         } catch (Exception e) {
             log.error("Error during save process", e);
             throw new ProcessSaveException(e.getMessage());
@@ -129,7 +129,7 @@ public class ProcessService {
         validateProcess(process);
         if (!Objects.isNull(process.getFinishDate())) {
             log.error("Process with number {} already finalized", process.getProcessNumber());
-            throw new ProcessAlreadyFinishedDuringIncludeProcessOpinionException("Process already finalized");
+            throw new ProcessAlreadyFinishedDuringIncludeProcessOpinionException("Process is finalized");
         }
     }
 

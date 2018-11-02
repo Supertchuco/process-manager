@@ -39,7 +39,7 @@ public class Process implements Serializable {
     @JoinColumn(name = "authorizedUserId")
     private List<User> authorizedUsers;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JsonManagedReference
     @JoinColumn(name = "processId")
     private List<ProcessOpinion> processOpinions;
