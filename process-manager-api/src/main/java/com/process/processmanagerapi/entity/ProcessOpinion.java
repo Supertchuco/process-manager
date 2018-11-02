@@ -30,11 +30,6 @@ public class ProcessOpinion implements Serializable {
 
     @OneToOne
     @JsonManagedReference
-    @JoinColumn(name = "originProcessId", nullable = false)
-    private Process process;
-
-    @OneToOne
-    @JsonManagedReference
     @JoinColumn(name = "originUserId", nullable = false)
     private User user;
 
@@ -42,6 +37,5 @@ public class ProcessOpinion implements Serializable {
         this.processOpinion = processOpinion;
         this.createDate = createDate;
         this.createBy = createBy;
-       // this.process = process;
     }
 }

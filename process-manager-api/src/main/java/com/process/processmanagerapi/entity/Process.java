@@ -34,6 +34,16 @@ public class Process implements Serializable {
     @Column
     private String createBy;
 
+    @ManyToMany
+    @JsonManagedReference
+    @JoinColumn(name = "authorizedUserId")
+    private List<User> authorizedUsers;
+
+    @OneToMany
+    @JsonManagedReference
+    @JoinColumn(name = "processId")
+    private List<ProcessOpinion> processOpinions;
+
     public Process(final int processNumber, final String processDescription, final Date createDate, final String createBy) {
         this.processNumber = processNumber;
         this.processDescription = processDescription;

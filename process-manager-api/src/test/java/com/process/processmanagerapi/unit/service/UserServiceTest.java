@@ -50,26 +50,26 @@ public class UserServiceTest {
         UserType userType = new UserType(1, UserService.ADMIN_TYPE);
         doReturn(userType).when(userTypeService).findUserTypeByUserTypeName(Mockito.anyString());
         doReturn(user).when(userRepository).save(Mockito.any(User.class));
-        doReturn(user).when(userRepository).findByUserName("createdByTest");
+        doReturn(user).when(userRepository).findByName("createdByTest");
         assertEquals(user, userService.createUser(new CreateUserVO("userNameTest", "pass", UserService.ADMIN_TYPE, "createdByTest")));
     }
 
     @Test(expected = UserNameAlreadyExistException.class)
     public void createUserTestWhenUserNameAlreadyExist() {
-        doReturn(user).when(userRepository).findByUserName(Mockito.anyString());
+        doReturn(user).when(userRepository).findByName(Mockito.anyString());
         userService.createUser(new CreateUserVO("userNameTest", "pass", UserService.ADMIN_TYPE, "createdByTest"));
     }
 
     @Test(expected = UserTypeNotFoundException.class)
     public void createUserTestWhenUserTypeNotFound() {
-        doReturn(user).when(userRepository).findByUserName("createdByTest");
+        doReturn(user).when(userRepository).findByName("createdByTest");
         doReturn(user).when(userRepository).save(Mockito.any(User.class));
         userService.createUser(new CreateUserVO("userNameTest", "pass", UserService.ADMIN_TYPE, "createdByTest"));
     }
 
     @Test(expected = UserSaveException.class)
     public void createUserTestWhenSaveErrorOccurred() {
-        doReturn(user).when(userRepository).findByUserName("createdByTest");
+        doReturn(user).when(userRepository).findByName("createdByTest");
         UserType userType = new UserType(1, UserService.ADMIN_TYPE);
         doReturn(userType).when(userTypeService).findUserTypeByUserTypeName(Mockito.anyString());
         doThrow(UserSaveException.class).when(userRepository).save(Mockito.any(User.class));
@@ -126,13 +126,13 @@ public class UserServiceTest {
 
     @Test
     public void findUserByUserNameTestHappyScenario() {
-        doReturn(user).when(userRepository).findByUserName(Mockito.anyString());
-        assertEquals(user, userService.findUserByUserName(Mockito.anyString()));
+        doReturn(user).when(userRepository).findByName(Mockito.anyString());
+        assertEquals(user, userService.findUserByName(Mockito.anyString()));
     }
 
     @Test(expected = UserServiceException.class)
     public void findUserByUserNameTestWhenSomeExceptionOccurred() {
-        doThrow(IllegalArgumentException.class).when(userRepository).findByUserName(Mockito.anyString());
-        userService.findUserByUserName(Mockito.anyString());
+        doThrow(IllegalArgumentException.class).when(userRepository).findByName(Mockito.anyString());
+        userService.findUserByName(Mockito.anyString());
     }
 }

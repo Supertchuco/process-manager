@@ -27,9 +27,9 @@ public class ProcessService {
 
     public Process createProcess(final CreateProcessVO createProcessVO) {
         log.info("Create new process with number: {}", createProcessVO.getProcessNumber());
-        User user = userService.findUserByUserName(createProcessVO.getCreateBy());
+        User user = userService.findUserByName(createProcessVO.getCreateBy());
         userService.validateUser(user, UserService.TRIADOR_USER);
-        validateCreationProcess(createProcessVO.getProcessNumber());
+        validateProcessCreation(createProcessVO.getProcessNumber());
         Process process = new Process(createProcessVO.getProcessNumber(), createProcessVO.getProcessDescription(),
                 new Date(), createProcessVO.getCreateBy());
         try {
@@ -45,20 +45,20 @@ public class ProcessService {
 
     public Process includeProcessOpinion(final ProcessOpinionVO processOpinionVO) {
         log.info("Add process opinion to process with number {}", processOpinionVO.getProcessNumber());
-        User user = userService.findUserByUserName(processOpinionVO.getUserName());
+        User user = userService.findUserByName(processOpinionVO.getUserName());
         userService.validateUser(user, UserService.FINISHER_USER);
         Process process = findProcessByProcessNumber(processOpinionVO.getProcessNumber());
         validateProcessBeforeIncludeOpinion(process);
-    /*     if (!userService.isUserAuthorizedToIncludeProcessOpinion(user, process.getOpinionUsers())) {
+         if (!userService.isUserAuthorizedToIncludeProcessOpinion(user, process.getAuthorizedUsers())) {
             log.error("User {} is not authorized to add process opinion");
             throw new UserNotAuthorizedToIncludeProcessOpnionException("User is not authorized to add process opinion");
 
         }
-       if (Objects.isNull(process.getProcessOpinion())) {
-            process.setProcessOpinion(new ArrayList<>());
+       if (Objects.isNull(process.getProcessOpinions())) {
+            process.setProcessOpinions(new ArrayList<>());
         }
-        process.getProcessOpinion().add(new ProcessOpinion(processOpinionVO.getProcessOpinion(), new Date(),
-                processOpinionVO.getUserName()));*/
+        process.getProcessOpinions().add(new ProcessOpinion(processOpinionVO.getProcessOpinion(), new Date(),
+                processOpinionVO.getUserName()));
         try {
             process = processRepository.save(process);
 
@@ -72,7 +72,7 @@ public class ProcessService {
 
     public Process finishProcess(final FinishProcessVO finishProcessVO) {
         log.info("Finish process with number {}", finishProcessVO.getProcessNumber());
-        User user = userService.findUserByUserName(finishProcessVO.getFinishBy());
+        User user = userService.findUserByName(finishProcessVO.getFinishBy());
         userService.validateUser(user, UserService.FINISHER_USER);
         Process process = findProcessByProcessNumber(finishProcessVO.getProcessNumber());
         validateProcessBeforeFinishProcess(process);
@@ -91,14 +91,14 @@ public class ProcessService {
 
     public Process getProcessByProcessNumber(final ViewProcessByProcessNumberVO viewProcessByProcessNumberVO) {
         log.info("Find process by process number");
-        User user = userService.findUserByUserName(viewProcessByProcessNumberVO.getViewBy());
+        User user = userService.findUserByName(viewProcessByProcessNumberVO.getViewBy());
         userService.validateUser(user, UserService.TRIADOR_USER);
         return findProcessByProcessNumber(viewProcessByProcessNumberVO.getProcessNumber());
     }
 
     public List<Process> findAllProcess(final ViewAllProcessVO viewAllProcessVO) {
         log.info("Find process by process number");
-        User user = userService.findUserByUserName(viewAllProcessVO.getViewBy());
+        User user = userService.findUserByName(viewAllProcessVO.getViewBy());
         userService.validateUser(user, UserService.TRIADOR_USER);
         return processRepository.findAll();
     }
@@ -133,8 +133,8 @@ public class ProcessService {
         }
     }
 
-    private void validateCreationProcess(final int processNumber) {
-        log.info("validate creation process with number {}", processNumber);
+    private void validateProcessCreation(final int processNumber) {
+        log.info("validate process creation with number {}", processNumber);
         Process process = processRepository.findByProcessNumber(processNumber);
         if (!Objects.isNull(process)) {
             log.error("Process already exist with number {}", processNumber);

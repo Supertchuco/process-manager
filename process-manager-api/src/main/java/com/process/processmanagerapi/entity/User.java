@@ -1,6 +1,5 @@
 package com.process.processmanagerapi.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -20,7 +19,7 @@ public class User implements Serializable {
     private int userId;
 
     @Column
-    private String userName;
+    private String name;
 
     @Column
     private String password;
@@ -35,8 +34,8 @@ public class User implements Serializable {
     @JoinColumn(name = "userTypeId")
     private UserType userType;
 
-    public User(final String userName, final String password, final Date createDate, final String createBy) {
-        this.userName = userName;
+    public User(final String name, final String password, final Date createDate, final String createBy) {
+        this.name = name;
         this.password = password;
         this.createDate = createDate;
         this.createBy = createBy;

@@ -15,6 +15,7 @@ import org.springframework.util.ResourceUtils;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @ActiveProfiles("test")
 @Sql({"/sql/purge.sql", "/sql/seed.sql"})
@@ -45,8 +46,34 @@ public class ProcessManageApiIntegrationTest {
     public void shouldReturn200WhenCreateNewProcessWithSuccess() {
         String payload = readJSON("request/createProcessWithSuccessPayload.json");
         HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
-        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/createProcess"), HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/create"), HttpMethod.POST, entity, String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
+    @Test
+    public void shouldReturn400WhenCreateNewProcessWhenUserNotExist() {
+        String payload = readJSON("request/createProcessWithUserNotExistOnDatabasePayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/create"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenCreateNewProcessWhenUserIsNotAuthorizedToCreateProcess() {
+        String payload = readJSON("request/createProcessWithUserNotExistOnDatabasePayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/create"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenProcessIdAlreadyExist() {
+        String payload = readJSON("request/createProcessWhenUserIsNotAuthorizedPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/create"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
+    }
 }

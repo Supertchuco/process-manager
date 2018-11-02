@@ -30,10 +30,10 @@ public class UserService {
     public final static String TRIADOR_USER = "USUARIO-TRIADOR";
     public final static String FINISHER_USER = "USUARIO-FINALIZADOR";
 
-    public User findUserByUserName(final String userName) {
+    public User findUserByName(final String userName) {
         log.info("find user by user name: {}", userName);
         try {
-            return userRepository.findByUserName(userName);
+            return userRepository.findByName(StringUtils.upperCase(userName));
         } catch (Exception e) {
             log.error("Error to get user by user name {}", userName, e);
             throw new UserServiceException("Error to get user by user name");
@@ -42,7 +42,7 @@ public class UserService {
 
     public List<User> getAllUsers(ViewAllUsersVO viewAllUsersVO){
         log.info("find all users");
-        User triggerUser = userRepository.findByUserName(viewAllUsersVO.getViewBy());
+        User triggerUser = userRepository.findByName(viewAllUsersVO.getViewBy());
         validateUser(triggerUser, UserService.ADMIN_TYPE);
         try {
             return userRepository.findAll();
@@ -76,17 +76,17 @@ public class UserService {
             return false;
         }
         return opinionUsers.stream()
-                .map(User::getUserName)
-                .anyMatch(user.getUserName()::equals);
+                .map(User::getName)
+                .anyMatch(user.getName()::equals);
     }
 
     public User createUser(final CreateUserVO createUserVO) {
         log.info("Create user with user name: {} and user type: {}", createUserVO.getUserName(), createUserVO.getUserType());
 
-        User triggerUser = userRepository.findByUserName(createUserVO.getCreatedByUser());
+        User triggerUser = userRepository.findByName(createUserVO.getCreatedByUser());
         validateUser(triggerUser, UserService.ADMIN_TYPE);
 
-        User user = userRepository.findByUserName(createUserVO.getUserName());
+        User user = userRepository.findByName(createUserVO.getUserName());
         if (!Objects.isNull(user)) {
             log.error("User with user name: {} already exist", createUserVO.getUserName());
             throw new UserNameAlreadyExistException("User with user name specified already exist");

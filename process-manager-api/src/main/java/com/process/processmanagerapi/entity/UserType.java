@@ -14,7 +14,6 @@ import java.io.Serializable;
 public class UserType implements Serializable {
 
     @Id
-    @GeneratedValue
     @Column
     private int userTypeId;
 
