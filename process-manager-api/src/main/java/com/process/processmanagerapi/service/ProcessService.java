@@ -51,7 +51,7 @@ public class ProcessService {
         validateProcessBeforeIncludeOpinion(process);
         if (!userService.isUserAuthorizedToIncludeProcessOpinion(user, process.getAuthorizedUsers())) {
             log.error("User {} is not authorized to add process opinion");
-            throw new UserNotAuthorizedToIncludeProcessOpnionException("User is not authorized to add process opinion for this process");
+            throw new UserNotAuthorizedToIncludeProcessOpinionException("User is not authorized to add process opinion for this process");
 
         }
         if (Objects.isNull(process.getProcessOpinions())) {
@@ -76,11 +76,15 @@ public class ProcessService {
         userService.validateUser(user, UserService.FINISHER_USER);
         Process process = findProcessByProcessNumber(finishProcessVO.getProcessNumber());
         validateProcessBeforeFinishProcess(process);
+
+        if (!userService.isUserAuthorizedToIncludeProcessOpinion(user, process.getAuthorizedUsers())) {
+            log.error("User {} is not authorized to add process opinion");
+            throw new UserNotAuthorizedToIncludeProcessOpinionException("User is not authorized to finish this process");
+        }
         process.setFinishDate(new Date());
         process.setFinishBy(finishProcessVO.getFinishBy());
         try {
             process = processRepository.save(process);
-
         } catch (Exception e) {
             log.error("Error during save process", e);
             throw new ProcessSaveException(e.getMessage());
@@ -120,7 +124,7 @@ public class ProcessService {
         validateProcess(process);
         if (!Objects.isNull(process.getFinishDate())) {
             log.error("Process with number {} already finalized", process.getProcessNumber());
-            throw new ProcessAlreadyFinishedDuringFinishProcessException("Process already finalized");
+            throw new ProcessAlreadyFinishedDuringFinishProcessException("Process already finished");
         }
     }
 
@@ -129,7 +133,7 @@ public class ProcessService {
         validateProcess(process);
         if (!Objects.isNull(process.getFinishDate())) {
             log.error("Process with number {} already finalized", process.getProcessNumber());
-            throw new ProcessAlreadyFinishedDuringIncludeProcessOpinionException("Process is finalized");
+            throw new ProcessAlreadyFinishedDuringIncludeProcessOpinionException("Process already finished");
         }
     }
 

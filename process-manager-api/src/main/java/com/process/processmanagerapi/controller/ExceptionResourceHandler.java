@@ -67,8 +67,15 @@ public class ExceptionResourceHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UserNotAuthorizedToIncludeProcessOpnionException.class)
-    public final ResponseEntity<ExceptionResponse> handleUserNotAuthorizedToIncludeProcessOpnionException(UserNotAuthorizedToIncludeProcessOpnionException ex, WebRequest request) {
+    @ExceptionHandler(UserNotAuthorizedToIncludeProcessOpinionException.class)
+    public final ResponseEntity<ExceptionResponse> handleUserNotAuthorizedToIncludeProcessOpnionException(UserNotAuthorizedToIncludeProcessOpinionException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
+                request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNotAuthorizedToFinishProcessException.class)
+    public final ResponseEntity<ExceptionResponse> handleUserNotAuthorizedToFinishProcessException(UserNotAuthorizedToFinishProcessException ex, WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
                 request.getDescription(false));
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);

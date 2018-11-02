@@ -36,7 +36,7 @@ public class ProcessManageApiIntegrationTest {
         }
     }
 
-    private HttpHeaders buildHttpHeaders(){
+    private HttpHeaders buildHttpHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return headers;
@@ -100,7 +100,7 @@ public class ProcessManageApiIntegrationTest {
         HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
         ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/includeProcessOpinion"), HttpMethod.POST, entity, String.class);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue(response.getBody().toString().contains("Process is finalized"));
+        assertTrue(response.getBody().toString().contains("Process already finished"));
     }
 
     @Test
@@ -120,4 +120,58 @@ public class ProcessManageApiIntegrationTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertTrue(response.getBody().toString().contains("User is not authorized to add process opinion for this process"));
     }
+
+    @Test
+    public void shouldReturn200WhenFinishProcessWithSuccess() {
+        String payload = readJSON("request/finishProcessWithSuccessPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/finish"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void shouldReturn400WhenFinishProcessWithUserNotFound() {
+        String payload = readJSON("request/finishProcessWithUserNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/finish"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenFinishProcessWithUserNotAuthorizedToPerformThisOperation() {
+        String payload = readJSON("request/finishProcessWithUserIsNotAuthorizedToPerformThisOperationPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/finish"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
+    }
+
+    @Test
+    public void shouldReturn400WhenFinishProcessWithProcessNotFound() {
+        String payload = readJSON("request/finishProcessWithProcessNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/finish"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("Process not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenFinishProcessWithProcessAlreadyFinished() {
+        String payload = readJSON("request/finishProcessWithProcessAlreadyFinishedPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/finish"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("Process already finished"));
+    }
+
+    @Test
+    public void shouldReturn400WhenFinishProcessWithUseIsNotAuthorizedToPerformThisOperationInThisProcess() {
+        String payload = readJSON("request/finishProcessWithUserIsNotAuthorizedToFinishThisProcessPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/finish"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User is not authorized to finish this process"));
+    }
+
 }

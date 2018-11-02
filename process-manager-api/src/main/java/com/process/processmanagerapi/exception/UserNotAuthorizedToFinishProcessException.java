@@ -3,11 +3,11 @@ package com.process.processmanagerapi.exception;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class UserNotAuthorizedToIncludeProcessOpnionException extends RuntimeException {
+public class UserNotAuthorizedToFinishProcessException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    public UserNotAuthorizedToIncludeProcessOpnionException(final String message) {
+    public UserNotAuthorizedToFinishProcessException(final String message) {
         super(message);
     }
 }
