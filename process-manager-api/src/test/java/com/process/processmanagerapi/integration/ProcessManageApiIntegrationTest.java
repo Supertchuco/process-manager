@@ -42,6 +42,8 @@ public class ProcessManageApiIntegrationTest {
         return headers;
     }
 
+    //Tests for Process Controller
+
     @Test
     public void shouldReturn200WhenCreateNewProcessWithSuccess() {
         String payload = readJSON("request/createProcessWithSuccessPayload.json");
@@ -208,5 +210,33 @@ public class ProcessManageApiIntegrationTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
     }
+
+    @Test
+    public void shouldReturn200WhenFindAllByProcessWithSuccess() {
+        String payload = readJSON("request/findAllProcessWithSuccessPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/findAll"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void shouldReturn400WhenFindAllProcessWithUserNotFound() {
+        String payload = readJSON("request/findAllProcessWithUserNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/findAll"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenFindAllProcessWithUserNotAuthorizedToPerformThisOperation() {
+        String payload = readJSON("request/findAllProcessWithUserIsNotAuthorizedToPerformThisOperationPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/findAll"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
+    }
+
+    //Tests for User Controller
 
 }

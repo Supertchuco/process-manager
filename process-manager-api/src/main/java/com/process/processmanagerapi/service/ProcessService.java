@@ -78,7 +78,7 @@ public class ProcessService {
         validateProcessBeforeFinishProcess(process);
 
         if (!userService.isUserAuthorizedToIncludeProcessOpinion(user, process.getAuthorizedUsers())) {
-            log.error("User {} is not authorized to add process opinion");
+            log.error("User {} is not authorized to finish this process", user.getName());
             throw new UserNotAuthorizedToIncludeProcessOpinionException("User is not authorized to finish this process");
         }
         process.setFinishDate(new Date());
