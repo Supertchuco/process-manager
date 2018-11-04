@@ -36,7 +36,7 @@ public class Process implements Serializable {
 
     @ManyToMany
     @JsonManagedReference
-    @JoinColumn(name = "authorizedUserId")
+    @JoinColumn(name = "authorizedUserName")
     private List<User> authorizedUsers;
 
     @OneToMany(cascade = CascadeType.ALL)

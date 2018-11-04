@@ -84,8 +84,7 @@ public class ProcessServiceTest {
 
     @Test
     public void getProcessByProcessNumberTestHappyScenario() {
-        User user = new User("userTest", "passtest", new Date(), "createdByTest");
-        user.setUserType(new UserType(UserService.TRIADOR_USER));
+        User user = new User("userTest", "passtest", new Date(), "createdByTest", new UserType(UserService.TRIADOR_USER));
         doReturn(user).when(userService).findUserByName(Mockito.anyString());
         doReturn(process).when(processRepository).findByProcessNumber(Mockito.anyInt());
         assertEquals(process, processService.getProcessByProcessNumber(buildViewProcessByProcessNumberVO(1, "userTest")));
@@ -93,8 +92,7 @@ public class ProcessServiceTest {
 
     @Test(expected = UserNotAuthorizedException.class)
     public void getProcessByProcessNumberTestWhenUserIsNotTriadorUser() {
-        User user = new User("userTest", "passtest", new Date(), "createdByTest");
-        user.setUserType(new UserType(UserService.FINISHER_USER));
+        User user = new User("userTest", "passtest", new Date(), "createdByTest", new UserType(UserService.FINISHER_USER));
         doReturn(user).when(userService).findUserByName(Mockito.anyString());
         doThrow(UserNotAuthorizedException.class).when(userService).validateUser(Mockito.any(User.class), Mockito.anyString());
         processService.getProcessByProcessNumber(buildViewProcessByProcessNumberVO(1, "userTest"));
@@ -108,8 +106,9 @@ public class ProcessServiceTest {
 
     @Test
     public void finishProcessTestHappyScenario() {
-        User user = new User("userTest", "passtest", new Date(), "createdByTest");
-        user.setUserType(new UserType(UserService.FINISHER_USER));
+        User user = new User("userTest", "passtest", new Date(), "createdByTest", new UserType(UserService.FINISHER_USER));
+        process.setAuthorizedUsers(Arrays.asList(user));
+        doReturn(true).when(userService).isUserAuthorizedToIncludeProcessOpinion(user, process.getAuthorizedUsers());
         doReturn(user).when(userService).findUserByName(Mockito.anyString());
         doReturn(process).when(processRepository).findByProcessNumber(Mockito.anyInt());
         doReturn(process).when(processRepository).save(Mockito.any(Process.class));
@@ -118,8 +117,7 @@ public class ProcessServiceTest {
 
     @Test(expected = ProcessAlreadyFinishedDuringFinishProcessException.class)
     public void finishProcessTestWhenProcessAlreadyFinished() {
-        User user = new User("userTest", "passtest", new Date(), "createdByTest");
-        user.setUserType(new UserType(UserService.FINISHER_USER));
+        User user = new User("userTest", "passtest", new Date(), "createdByTest", new UserType(UserService.FINISHER_USER));
         doReturn(user).when(userService).findUserByName(Mockito.anyString());
         process.setFinishDate(new Date());
         process.setAuthorizedUsers(Arrays.asList(user));
@@ -149,8 +147,7 @@ public class ProcessServiceTest {
 
     @Test
     public void includeProcessOpinionTestHappyScenario() {
-        User user = new User("userTest", "passtest", new Date(), "createdByTest");
-        user.setUserType(new UserType(UserService.FINISHER_USER));
+        User user = new User("userTest", "passtest", new Date(), "createdByTest", new UserType(UserService.FINISHER_USER));
         doReturn(user).when(userService).findUserByName(Mockito.anyString());
         doReturn(process).when(processRepository).findByProcessNumber(Mockito.anyInt());
         doReturn(process).when(processRepository).save(Mockito.any(Process.class));
@@ -160,8 +157,7 @@ public class ProcessServiceTest {
 
     @Test(expected = UserNotAuthorizedToIncludeProcessOpinionException.class)
     public void includeProcessOpinionTestWhenUserIsNotAuthorizedToIncludeOpinion() {
-        User user = new User("userTest", "passtest", new Date(), "createdByTest");
-        user.setUserType(new UserType(UserService.FINISHER_USER));
+        User user = new User("userTest", "passtest", new Date(), "createdByTest", new UserType(UserService.FINISHER_USER));
         doReturn(user).when(userService).findUserByName(Mockito.anyString());
         doReturn(process).when(processRepository).findByProcessNumber(Mockito.anyInt());
         doReturn(process).when(processRepository).save(Mockito.any(Process.class));
@@ -171,8 +167,7 @@ public class ProcessServiceTest {
 
     @Test
     public void createProcessTestHappyScenario() {
-        User user = new User("userTest", "passtest", new Date(), "createdByTest");
-        user.setUserType(new UserType(UserService.TRIADOR_USER));
+        User user = new User("userTest", "passtest", new Date(), "createdByTest", new UserType(UserService.TRIADOR_USER));
         doReturn(user).when(userService).findUserByName(Mockito.anyString());
         doReturn(process).when(processRepository).save(Mockito.any(Process.class));
         CreateProcessVO createProcessVO = new CreateProcessVO();

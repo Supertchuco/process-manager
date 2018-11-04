@@ -132,7 +132,7 @@ public class ProcessManageApiIntegrationTest {
     }
 
     @Test
-    public void shouldReturn400WhenFinishProcessWithUserNotFound() {
+    public void shouldReturn404WhenFinishProcessWithUserNotFound() {
         String payload = readJSON("request/finishProcessWithUserNotFoundPayload.json");
         HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
         ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/finish"), HttpMethod.POST, entity, String.class);
@@ -194,7 +194,7 @@ public class ProcessManageApiIntegrationTest {
     }
 
     @Test
-    public void shouldReturn400WhenFindByProcessNumberWithUserNotFound() {
+    public void shouldReturn404WhenFindByProcessNumberWithUserNotFound() {
         String payload = readJSON("request/findProcessByProcessNumberWithUserNotFoundPayload.json");
         HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
         ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/findByProcessNumber"), HttpMethod.POST, entity, String.class);
@@ -238,5 +238,75 @@ public class ProcessManageApiIntegrationTest {
     }
 
     //Tests for User Controller
+
+    @Test
+    public void shouldReturn200WhenCreateANewUserWithSuccess() {
+        String payload = readJSON("request/createNewUserWithSuccessPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/create"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void shouldReturn404WhenCreateUserWithUserNotFound() {
+        String payload = readJSON("request/createNewUserWithUserAdminNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/create"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenCreateUserWithUserAdminIsNotAuthorized() {
+        String payload = readJSON("request/createNewUserWithUserAdminIsNotAuthorizedPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/create"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
+    }
+
+    @Test
+    public void shouldReturn400WhenCreateUserWithUserNameAlreadyExist() {
+        String payload = readJSON("request/createNewUserWithUserNameAlreadyExistPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/create"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User with user name specified already exist"));
+    }
+
+    @Test
+    public void shouldReturn400WhenCreateUserWithUserTypeNotExist() {
+        String payload = readJSON("request/createNewUserWithUserTypeNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/create"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User type specified not found"));
+    }
+
+    @Test
+    public void shouldReturn200WhenGetAllUsersWithSuccess() {
+        String payload = readJSON("request/getAllUsersWithSuccessPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/users"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void shouldReturn404WhenGetAllUsersWithUserAdminNotFound() {
+        String payload = readJSON("request/getAllUsersWithViewedNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/users"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenGetAllUsersWithUserAdminIsNotAuthorized() {
+        String payload = readJSON("request/getAllUserWithUserAdminIsNotAuthorizedPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/users"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
+    }
 
 }

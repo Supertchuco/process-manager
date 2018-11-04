@@ -41,8 +41,7 @@ public class UserServiceTest {
 
     @Before
     public void setUp() {
-        user = new User("userNameTest", "pass", new Date(), "createdByTest");
-        user.setUserType(new UserType(1, UserService.ADMIN_TYPE));
+        user = new User("userNameTest", "pass", new Date(), "createdByTest", new UserType(1, UserService.ADMIN_TYPE));
     }
 
     @Test
@@ -50,30 +49,30 @@ public class UserServiceTest {
         UserType userType = new UserType(1, UserService.ADMIN_TYPE);
         doReturn(userType).when(userTypeService).findUserTypeByUserTypeName(Mockito.anyString());
         doReturn(user).when(userRepository).save(Mockito.any(User.class));
-        doReturn(user).when(userRepository).findByName("createdByTest");
-        assertEquals(user, userService.createUser(new CreateUserVO("userNameTest", "pass", UserService.ADMIN_TYPE, "createdByTest")));
+        doReturn(user).when(userRepository).findByName("CREATEDBYTEST");
+        assertEquals(user, userService.createUser(buildCreateUserVO("userNameTest", "pass", UserService.ADMIN_TYPE, "createdByTest")));
     }
 
     @Test(expected = UserNameAlreadyExistException.class)
     public void createUserTestWhenUserNameAlreadyExist() {
         doReturn(user).when(userRepository).findByName(Mockito.anyString());
-        userService.createUser(new CreateUserVO("userNameTest", "pass", UserService.ADMIN_TYPE, "createdByTest"));
+        userService.createUser(buildCreateUserVO("userNameTest", "pass", UserService.ADMIN_TYPE, "createdByTest"));
     }
 
     @Test(expected = UserTypeNotFoundException.class)
     public void createUserTestWhenUserTypeNotFound() {
-        doReturn(user).when(userRepository).findByName("createdByTest");
+        doReturn(user).when(userRepository).findByName("CREATEDBYTEST");
         doReturn(user).when(userRepository).save(Mockito.any(User.class));
-        userService.createUser(new CreateUserVO("userNameTest", "pass", UserService.ADMIN_TYPE, "createdByTest"));
+        userService.createUser(buildCreateUserVO("userNameTest", "pass", UserService.ADMIN_TYPE, "createdByTest"));
     }
 
     @Test(expected = UserSaveException.class)
     public void createUserTestWhenSaveErrorOccurred() {
-        doReturn(user).when(userRepository).findByName("createdByTest");
+        doReturn(user).when(userRepository).findByName("CREATEDBYTEST");
         UserType userType = new UserType(1, UserService.ADMIN_TYPE);
         doReturn(userType).when(userTypeService).findUserTypeByUserTypeName(Mockito.anyString());
         doThrow(UserSaveException.class).when(userRepository).save(Mockito.any(User.class));
-        userService.createUser(new CreateUserVO("userNameTest", "pass", UserService.ADMIN_TYPE, "createdByTest"));
+        userService.createUser(buildCreateUserVO("userNameTest", "pass", UserService.ADMIN_TYPE, "createdByTest"));
     }
 
     @Test
@@ -84,7 +83,8 @@ public class UserServiceTest {
 
     @Test
     public void isUserAuthorizedToIncludeProcessOpinionTestWhenUserIsNotAuthorized() {
-        User user2 = new User("otherUserName", "pass", new Date(), "createdByTest");
+        UserType userType = new UserType(1, UserService.FINISHER_USER);
+        User user2 = new User("otherUserName", "pass", new Date(), "createdByTest", userType);
         List<User> users = Arrays.asList(user2);
         assertEquals(false, userService.isUserAuthorizedToIncludeProcessOpinion(user, users));
     }
@@ -134,5 +134,14 @@ public class UserServiceTest {
     public void findUserByUserNameTestWhenSomeExceptionOccurred() {
         doThrow(IllegalArgumentException.class).when(userRepository).findByName(Mockito.anyString());
         userService.findUserByName(Mockito.anyString());
+    }
+
+    private CreateUserVO buildCreateUserVO(final String userName, final String passwd, final String userType, final String createdBy) {
+        CreateUserVO createUserVO = new CreateUserVO();
+        createUserVO.setUserName(userName);
+        createUserVO.setPassword(passwd);
+        createUserVO.setUserType(userType);
+        createUserVO.setCreatedByUser(createdBy);
+        return createUserVO;
     }
 }

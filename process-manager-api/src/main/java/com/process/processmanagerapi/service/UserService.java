@@ -40,9 +40,9 @@ public class UserService {
         }
     }
 
-    public List<User> getAllUsers(ViewAllUsersVO viewAllUsersVO){
+    public List<User> getAllUsers(ViewAllUsersVO viewAllUsersVO) {
         log.info("find all users");
-        User triggerUser = userRepository.findByName(viewAllUsersVO.getViewBy());
+        User triggerUser = userRepository.findByName(StringUtils.upperCase(viewAllUsersVO.getViewBy()));
         validateUser(triggerUser, UserService.ADMIN_TYPE);
         try {
             return userRepository.findAll();
@@ -83,28 +83,32 @@ public class UserService {
     public User createUser(final CreateUserVO createUserVO) {
         log.info("Create user with user name: {} and user type: {}", createUserVO.getUserName(), createUserVO.getUserType());
 
-        User triggerUser = userRepository.findByName(createUserVO.getCreatedByUser());
-        validateUser(triggerUser, UserService.ADMIN_TYPE);
+        String newUserName = StringUtils.upperCase(createUserVO.getUserName());
+        String newUserType = StringUtils.upperCase(createUserVO.getUserType());
+        String newUserPassword = StringUtils.upperCase(createUserVO.getPassword());
+        String adminUserName = StringUtils.upperCase(createUserVO.getCreatedByUser());
 
-        User user = userRepository.findByName(createUserVO.getUserName());
-        if (!Objects.isNull(user)) {
+        User adminUser = userRepository.findByName(adminUserName);
+        validateUser(adminUser, UserService.ADMIN_TYPE);
+
+        User userDB = userRepository.findByName(newUserName);
+        if (!Objects.isNull(userDB)) {
             log.error("User with user name: {} already exist", createUserVO.getUserName());
             throw new UserNameAlreadyExistException("User with user name specified already exist");
         }
-        UserType userType = userTypeService.findUserTypeByUserTypeName(createUserVO.getUserType());
+        UserType userType = userTypeService.findUserTypeByUserTypeName(newUserType);
         if (Objects.isNull(userType)) {
             log.error("User type with user type name: {} not found", createUserVO.getUserType());
-            throw new UserTypeNotFoundException("User with user name specified already exist");
+            throw new UserTypeNotFoundException("User type specified not found");
         }
-        user = new User(createUserVO.getUserName(), createUserVO.getPassword(), new Date(), createUserVO.getCreatedByUser());
-        user.setUserType(userType);
+        User newUser = new User(newUserName, newUserPassword, new Date(), adminUserName, userType);
         try {
-            user = userRepository.save(user);
+            newUser = userRepository.save(newUser);
         } catch (Exception e) {
             log.error("Error during save new user process", e);
             throw new UserSaveException(e.getMessage());
         }
         log.info("User created");
-        return user;
+        return newUser;
     }
 }

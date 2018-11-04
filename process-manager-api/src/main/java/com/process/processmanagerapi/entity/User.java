@@ -1,6 +1,5 @@
 package com.process.processmanagerapi.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -10,14 +9,9 @@ import java.util.Date;
 @Data
 @Entity(name = "ProcessUser")
 @Table(name = "ProcessUser")
-@AllArgsConstructor
 public class User implements Serializable {
 
     @Id
-    @GeneratedValue
-    @Column
-    private int userId;
-
     @Column
     private String name;
 
@@ -34,10 +28,12 @@ public class User implements Serializable {
     @JoinColumn(name = "userTypeId")
     private UserType userType;
 
-    public User(final String name, final String password, final Date createDate, final String createBy) {
+    public User(final String name, final String password, final Date createDate, final String createBy, final UserType userType) {
         this.name = name;
         this.password = password;
         this.createDate = createDate;
         this.createBy = createBy;
+        this.userType = userType;
     }
+
 }
