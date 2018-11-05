@@ -7,6 +7,7 @@ import com.process.processmanagerapi.exception.*;
 import com.process.processmanagerapi.repository.ProcessRepository;
 import com.process.processmanagerapi.vo.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -146,6 +147,56 @@ public class ProcessService {
             log.error("Process already exist with number {}", processNumber);
             throw new ProcessAlreadyExistException("Process already exist");
         }
+    }
+
+    private void validateProcessBeforeAuthorizeUser(final Process process, final String userName) {
+        log.info("validate process to authorize user to manage process");
+        validateProcess(process);
+        for (User user : process.getAuthorizedUsers()) {
+            if (StringUtils.equals(user.getName(), userName)) {
+                log.error("User {} already authorized to process number {}", userName, process.getProcessNumber());
+                throw new UserAlreadyAuthorizedToManageProcessException("User already authorized");
+            }
+        }
+    }
+
+    public void removeAuthorizedUserToGiveOpinionToProcessByUserName(final String userName) {
+        processRepository.deleteUserAuthorizedToGiveOpinionByUserName(userName);
+    }
+
+    public Process authorizeUserToManageProcess(final AuthorizeUserProcessVO authorizeUserProcessVO) {
+        log.info("Authorize user {} to manage process {}", authorizeUserProcessVO.getUserName(), authorizeUserProcessVO.getProcessNumber());
+        User user = userService.findUserByName(authorizeUserProcessVO.getUserName());
+        userService.validateUser(user, UserService.FINISHER_USER);
+        userService.validateUser(userService.findUserByName(authorizeUserProcessVO.getAuthorizedBy()), UserService.TRIADOR_USER);
+        Process process = findProcessByProcessNumber(authorizeUserProcessVO.getProcessNumber());
+        validateProcessBeforeAuthorizeUser(process, user.getName());
+        process.getAuthorizedUsers().add(user);
+        try {
+            process = processRepository.save(process);
+        } catch (Exception e) {
+            log.error("Error during save process", e);
+            throw new ProcessSaveException(e.getMessage());
+        }
+        log.info("User authorized");
+        return process;
+    }
+
+    public Process unauthorizeUserToManageProcess(final UnauthorizedUserProcessVO unauthorizedUserProcessVO) {
+        log.info("Unauthorize user {} to manage process {}", unauthorizedUserProcessVO.getUserName(), unauthorizedUserProcessVO.getProcessNumber());
+        User user = userService.findUserByName(unauthorizedUserProcessVO.getUserName());
+        userService.verifyIfUserIsNull(user);
+        Process process = findProcessByProcessNumber(unauthorizedUserProcessVO.getProcessNumber());
+        validateProcess(process);
+        process.getAuthorizedUsers().removeIf(s -> s.getName().toUpperCase().equals(user.getName()));
+        try {
+            process = processRepository.save(process);
+        } catch (Exception e) {
+            log.error("Error during save process", e);
+            throw new ProcessSaveException(e.getMessage());
+        }
+        log.info("User unauthorized");
+        return process;
     }
 
 }

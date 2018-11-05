@@ -1,16 +1,20 @@
 package com.process.processmanagerapi.integration;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 
@@ -27,6 +31,15 @@ public class ProcessManageApiIntegrationTest {
 
     @Autowired
     private TestRestTemplate testRestTemplate;
+
+    private RestTemplate patchTestRestTemplate;
+
+    private RestTemplate buildPatchRestTemplate(){
+        RestTemplate patchRestTemplate = testRestTemplate.getRestTemplate();
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        patchRestTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(httpClient));
+        return patchRestTemplate;
+    }
 
     private static String readJSON(String filename) {
         try {
@@ -257,7 +270,7 @@ public class ProcessManageApiIntegrationTest {
     }
 
     @Test
-    public void shouldReturn400WhenCreateUserWithUserAdminIsNotAuthorized() {
+    public void shouldReturn400WhenCreateUserWithAdminUserIsNotAuthorized() {
         String payload = readJSON("request/createNewUserWithUserAdminIsNotAuthorizedPayload.json");
         HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
         ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/create"), HttpMethod.POST, entity, String.class);
@@ -292,7 +305,7 @@ public class ProcessManageApiIntegrationTest {
     }
 
     @Test
-    public void shouldReturn404WhenGetAllUsersWithUserAdminNotFound() {
+    public void shouldReturn404WhenGetAllUsersWithAdminUserNotFound() {
         String payload = readJSON("request/getAllUsersWithViewedNotFoundPayload.json");
         HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
         ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/users"), HttpMethod.POST, entity, String.class);
@@ -301,12 +314,174 @@ public class ProcessManageApiIntegrationTest {
     }
 
     @Test
-    public void shouldReturn400WhenGetAllUsersWithUserAdminIsNotAuthorized() {
+    public void shouldReturn400WhenGetAllUsersWithAdminUserIsNotAuthorized() {
         String payload = readJSON("request/getAllUserWithUserAdminIsNotAuthorizedPayload.json");
         HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
         ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/users"), HttpMethod.POST, entity, String.class);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
+    }
+
+    @Test
+    public void shouldReturn200WhenGetUserByUserNameWithSuccess() {
+        String payload = readJSON("request/getUserByUserNameWithSuccessPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/user"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void shouldReturn404WhenGetUserByNameWithAdminUserNotFound() {
+        String payload = readJSON("request/getUserByUserNameWithAdminUserNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/user"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenGetUserByNameWithAdminUserIsNotAuthorized() {
+        String payload = readJSON("request/getUserByUserNameWithAdminUserNotAuthorizedPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/user"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
+    }
+
+    @Test
+    public void shouldReturn404WhenGetUserByNameWithUserNotFound() {
+        String payload = readJSON("request/getUserByUserNameWithUserNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/user"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
+    }
+
+    @Test
+    public void shouldReturn200WhenEditUserWithSuccess() {
+        String payload = readJSON("request/editUserWithSuccessPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        patchTestRestTemplate = buildPatchRestTemplate();
+        ResponseEntity<String> response = patchTestRestTemplate.exchange(requestEndpointBase.concat("/user/editUser"), HttpMethod.PATCH, entity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void shouldReturn404WhenEditUserWithAdminUserNotFound() {
+        String payload = readJSON("request/editUserWithAdminUserNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        patchTestRestTemplate = buildPatchRestTemplate();
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/editUser"), HttpMethod.PATCH, entity, String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenEditUserWithAdminUserNotAuthorized() {
+        String payload = readJSON("request/editUserWithAdminUserNotAuthorizedPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        patchTestRestTemplate = buildPatchRestTemplate();
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/editUser"), HttpMethod.PATCH, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
+    }
+
+    @Test
+    public void shouldReturn400WhenEditUserWithUserNotFound() {
+        String payload = readJSON("request/editUserWithUserNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        patchTestRestTemplate = buildPatchRestTemplate();
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/user/editUser"), HttpMethod.PATCH, entity, String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
+    }
+
+    @Test
+    public void shouldReturn200WhenAuthorizeUserWithSuccess() {
+        String payload = readJSON("request/authorizeUserWithSuccessPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/authorizeUserToManageProcess"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void shouldReturn404WhenAuthorizeUserWithTriadorUserNotFound() {
+        String payload = readJSON("request/authorizeUserWithTriadorUserNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/authorizeUserToManageProcess"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenAuthorizeUserWithTriadorUserNotAuthorized() {
+        String payload = readJSON("request/authorizeUserWithTriadorUserNotAutorizedPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/authorizeUserToManageProcess"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
+    }
+
+    @Test
+    public void shouldReturn404WhenAuthorizeUserWithUserNotFound() {
+        String payload = readJSON("request/authorizeUserWithUserNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/authorizeUserToManageProcess"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenAuthorizeUserWithUserNotFinishUser() {
+        String payload = readJSON("request/authorizeUserWithUserNotFinishUserPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/authorizeUserToManageProcess"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
+    }
+
+    @Test
+    public void shouldReturn400WhenAuthorizeUserWithUserAlreadyAuthorized() {
+        String payload = readJSON("request/authorizeUserWithUserAlreadyAuthorizedPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/authorizeUserToManageProcess"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User already authorized"));
+    }
+
+    @Test
+    public void shouldReturn200WhenUnauthorizeUserWithSuccess() {
+        String payload = readJSON("request/unauthorizeUserWithSuccessPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/unauthorizeUserToManageProcess"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void shouldReturn404WhenUnauthorizeUserWithTriadorUserNotFound() {
+        String payload = readJSON("request/unauthorizeUserWithTriadorUserNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/authorizeUserToManageProcess"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
+    }
+
+    @Test
+    public void shouldReturn400WhenUnauthorizeUserWithTriadorUserNotAuthorized() {
+        String payload = readJSON("request/unauthorizeUserWithTriadorUserNotAuthorizedPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/authorizeUserToManageProcess"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User is not authorized to perform this operation"));
+    }
+
+    @Test
+    public void shouldReturn404WhenUnauthorizeUserWithUserNotFound() {
+        String payload = readJSON("request/getUserByUserNameWithAdminUserNotFoundPayload.json");
+        HttpEntity<String> entity = new HttpEntity<String>(payload, buildHttpHeaders());
+        ResponseEntity<String> response = testRestTemplate.exchange(requestEndpointBase.concat("/process/authorizeUserToManageProcess"), HttpMethod.POST, entity, String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User not found"));
     }
 
 }

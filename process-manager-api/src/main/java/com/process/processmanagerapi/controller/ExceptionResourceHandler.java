@@ -123,4 +123,11 @@ public class ExceptionResourceHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(UserAlreadyAuthorizedToManageProcessException.class)
+    public final ResponseEntity<ExceptionResponse> handleUserAlreadyAuthorizedToManageProcessException(UserAlreadyAuthorizedToManageProcessException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
+                request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
+
 }

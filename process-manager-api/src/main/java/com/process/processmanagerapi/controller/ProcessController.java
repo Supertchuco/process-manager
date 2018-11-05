@@ -51,4 +51,18 @@ public class ProcessController {
         return processService.includeProcessOpinion(processOpinionVO);
     }
 
+    @RequestMapping(value = "/authorizeUserToManageProcess", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public Process authorizeUserToManageProcess(final @RequestBody AuthorizeUserProcessVO authorizeUserProcessVO) {
+        return processService.authorizeUserToManageProcess(authorizeUserProcessVO);
+    }
+
+    @RequestMapping(value = "/unauthorizeUserToManageProcess", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public Process unauthorizeUserToManageProcess(final @RequestBody UnauthorizedUserProcessVO unauthorizedUserProcessVO) {
+        return processService.unauthorizeUserToManageProcess(unauthorizedUserProcessVO);
+    }
+
 }
