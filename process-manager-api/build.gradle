@@ -53,19 +53,6 @@ docker {
     maintainer 'Rafael Soares de Almeida "rafael.whatsthestory@gmail.com"'
 }
 
-/*task buildDocker(type: Docker) {
-    baseImage = 'openjdk/openjdk:8u171-jre-alpine'
-    //baseImage = 'myrepo/java:latest'
-   // push = project.hasProperty('push')
-  //  tag = 'myrepo/testmessages'
-    addFile {
-        from jar
-        rename {'app.jar'}
-    }
-    entryPoint(['java', '-Djava.security.egd=file:/dev/./urandom', '-jar', '/app.jar'])
-
-}*/
-
 task buildDocker(type: Docker, dependsOn: build) {
     //push = true
     applicationName = jar.baseName
@@ -77,5 +64,3 @@ task buildDocker(type: Docker, dependsOn: build) {
         }
     }
 }
-
-//buildDocker.dependsOn(build)
